@@ -13,6 +13,7 @@ pygame.init()
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 pygame.display.set_caption('Agent Quack 007')
 clock = pygame.time.Clock()
+
 level = Level(levels[0], SCREEN)
 
 while True:
@@ -28,6 +29,5 @@ while True:
             
     SCREEN.fill('Black')
     level.run()
-
     pygame.display.update()
     clock.tick(FPS)
