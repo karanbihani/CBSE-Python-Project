@@ -13,13 +13,14 @@ pygame.init()
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 pygame.display.set_caption('Agent Quack 007')
 clock = pygame.time.Clock()
+
 level = Level(levels[0], SCREEN)
 
 while True:
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            pygame.quit()
+            pygame.quit()   
             sys.exit()
         
         if event.type == pygame.KEYDOWN:

@@ -1,11 +1,14 @@
+import os
+
 import pygame
-from coins import Coin
 from pygame.sprite import Group
+
+from coins import Coin
+from health import Health
 from player import Player
-import pygame
-from tiles import Tile
-from tiles import Tile
 from settings import *
+from tiles import Tile
+
 pygame.font.init()
 
 
@@ -15,7 +18,8 @@ class Level():
         self.setup_level(level_data)
         self.world_shift = 0
         self.coins_counter = 0
-
+        self.player_health = PLAYER_HEALTH
+        
     def setup_level(self, layout):
         self.coins = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
@@ -80,25 +84,38 @@ class Level():
         player = self.player.sprite
         if pygame.sprite.spritecollide(player, self.coins ,True):
             self.coins_counter += 1
+            self.player_health -= 1
+            print(self.player_health)
     
-    def display_coins(self):
+    def display_coins_collected(self):
         self.font = pygame.font.Font('Assets/font/Pixeltype.ttf',50)
-        self.text = self.font.render(f'Coins : {self.coins_counter}', False , 'pink')
-        self.text_rect = self.text.get_rect(center = (SCREEN_WIDTH//2 , 100))
+        self.text = self.font.render(f'  {self.coins_counter}', False , 'pink')
+        self.text_rect = self.text.get_rect(center = (980 , 110))
+
+        self.coin_image = pygame.image.load('Assets\Images\Coins\coin_2.png').convert_alpha()
+        self.coin_surface = pygame.transform.scale(self.coin_image,(50,50))
+        self.coin_rect = self.coin_surface.get_rect(topleft = (905,84))
+
         self.display_surface.blit(self.text,self.text_rect)
-            
+        self.display_surface.blit(self.coin_surface , self.coin_rect)
+
+    def health_run(self):
+        self.health = Health()
+        self.health.health_define(self.player_health, self.display_surface)
+
     def run(self):
         self.tiles.update(self.world_shift)
         self.tiles.draw(self.display_surface)
         self.coins.update(self.world_shift)
-        self.coins.draw(self.display_surface)
         self.collect_coins()
         self.scroll_x()
-        self.display_coins()
-
+        self.display_coins_collected()
+        self.health_run()
         self.player.update()
         self.player.draw(self.display_surface)
         self.horizontal_movement_collision()
         self.vertical_movement_collision()
+        self.coins.draw(self.display_surface)
+        #self.health.draw(self.display_surface)
         
 
