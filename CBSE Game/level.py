@@ -18,7 +18,7 @@ class Level():
         self.setup_level(level_data)
         self.world_shift = 0
         self.coins_counter = 0
-        self.player_health = PLAYER_HEALTH
+        self.health = Health()
         
     def setup_level(self, layout):
         self.coins = pygame.sprite.Group()
@@ -84,8 +84,7 @@ class Level():
         player = self.player.sprite
         if pygame.sprite.spritecollide(player, self.coins ,True):
             self.coins_counter += 1
-            self.player_health -= 1
-            print(self.player_health)
+            self.health.player_health -= 1
     
     def display_coins_collected(self):
         self.font = pygame.font.Font('Assets/font/Pixeltype.ttf',50)
@@ -99,10 +98,6 @@ class Level():
         self.display_surface.blit(self.text,self.text_rect)
         self.display_surface.blit(self.coin_surface , self.coin_rect)
 
-    def health_run(self):
-        self.health = Health()
-        self.health.health_define(self.player_health, self.display_surface)
-
     def run(self):
         self.tiles.update(self.world_shift)
         self.tiles.draw(self.display_surface)
@@ -110,7 +105,7 @@ class Level():
         self.collect_coins()
         self.scroll_x()
         self.display_coins_collected()
-        self.health_run()
+        self.health.health_run(self.display_surface)
         self.player.update()
         self.player.draw(self.display_surface)
         self.horizontal_movement_collision()
