@@ -19,6 +19,7 @@ class Health():
             x = self.x_start + spacer*self.spacer_x
             self.health_rect = self.health_icon_surface.get_rect(topleft = (x,y))
             display_surface.blit(self.health_icon_surface, self.health_rect)
+            
 
     def life_loss(self):
         if self.health_bar_length <= 0:

@@ -7,6 +7,8 @@ from pygame.constants import QUIT
 from settings import *
 from level import Level
 from level_data import levels
+from level_menue_data import menue_level
+from menue import Menue
 
 pygame.init()
 
@@ -14,7 +16,15 @@ SCREEN = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 pygame.display.set_caption('Agent Quack 007')
 clock = pygame.time.Clock()
 
-level = Level(levels[0], SCREEN)
+class Game():
+    def __init__(self,levels,menue_level):
+        self.game_active = False
+        self.menue_level = menue_level
+        self.level = levels
+        self.level = Level(self.level[0], SCREEN)
+        self.menue = Menue(self.menue_level,SCREEN,3)
+
+game = Game(levels,menue_level)
 
 while True:
     
@@ -28,7 +38,7 @@ while True:
                 pass
             
     SCREEN.fill('Black')
-    level.run()
+    game.menue.run()
 
     pygame.display.update()
     clock.tick(FPS)
