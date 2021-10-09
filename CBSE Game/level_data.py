@@ -1,10 +1,10 @@
 
 level_map_0 = [
     '                        ',
-    '                        ',
-    '     ccc                ',
-    'XX   XXX      XX     XXX',
-    'XX        cc   ccc     X',
+    '              cccc    ccc',
+    '     ccc      cccc   ccc',
+    'XXcccXXX      XX     XXX',
+    'XXccc     cc   ccc     X',
     'XXXXX     XX   XXX      ',
     'XXX      XXcc  X       c',
     'XX    X XXXcc XXX    X c',

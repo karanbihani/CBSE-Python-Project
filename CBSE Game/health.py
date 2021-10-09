@@ -18,14 +18,19 @@ class Health():
         for spacer in range(self.lives):
             x = self.x_start + spacer*self.spacer_x
             self.health_rect = self.health_icon_surface.get_rect(topleft = (x,y))
-            display_surface.blit(self.health_icon_surface, self.health_rect)
+            display_surface.blit(self.health_icon_surface, self.health_rect) 
 
     def life_loss(self):
         if self.health_bar_length <= 0:
             self.player_health = PLAYER_HEALTH
             self.lives -= 1
-        if self.lives == 2:
-            print('Game Over')
+            print(self.lives)
+    
+    def game_state_changer(self):
+        if self.lives == 0:
+            return False
+        else:
+            return True
 
     def health_define(self, display_surface ):
         self.health_bar_length = (SCREEN_WIDTH//120) * self.player_health

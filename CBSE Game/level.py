@@ -19,6 +19,7 @@ class Level():
         self.world_shift = 0
         self.coins_counter = 0
         self.health = Health()
+        self.game_active = True
         
     def setup_level(self, layout):
         self.coins = pygame.sprite.Group()
@@ -99,6 +100,7 @@ class Level():
         self.display_surface.blit(self.coin_surface , self.coin_rect)
 
     def run(self):
+        self.game_active = self.health.game_state_changer()
         self.tiles.update(self.world_shift)
         self.tiles.draw(self.display_surface)
         self.coins.update(self.world_shift)
