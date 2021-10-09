@@ -6,8 +6,10 @@ from pygame.sprite import Group
 from coins import Coin
 from health import Health
 from player import Player
+from enemies import Tracer
 from settings import *
 from tiles import Tile
+
 
 pygame.font.init()
 
@@ -20,6 +22,8 @@ class Level():
         self.coins_counter = 0
         self.health = Health()
         self.game_active = True
+        self.trace = pygame.sprite.GroupSingle()
+        self.tracer()
         
     def setup_level(self, layout):
         self.coins = pygame.sprite.Group()
@@ -92,12 +96,21 @@ class Level():
         self.text = self.font.render(f'  {self.coins_counter}', False , 'pink')
         self.text_rect = self.text.get_rect(center = (980 , 110))
 
-        self.coin_image = pygame.image.load('Assets\Images\Coins\coin_2.png').convert_alpha()
+        self.coin_image = pygame.image.load('Assets\Images\Coins\coiner.png').convert_alpha()
         self.coin_surface = pygame.transform.scale(self.coin_image,(50,50))
         self.coin_rect = self.coin_surface.get_rect(topleft = (905,84))
 
         self.display_surface.blit(self.text,self.text_rect)
         self.display_surface.blit(self.coin_surface , self.coin_rect)
+
+    def tracer(self):
+        trace_sprite = Tracer()
+        self.trace.add(trace_sprite)
+
+    def trace_collision(self):
+        player = self.player.sprite
+        if pygame.sprite.spritecollide(player, self.trace, True):
+            self.health.player_health-=6
 
     def run(self):
         self.game_active = self.health.game_state_changer()
@@ -110,6 +123,11 @@ class Level():
         self.health.health_run(self.display_surface)
         self.player.update()
         self.player.draw(self.display_surface)
+        #---------->
+        self.trace.draw(self.display_surface)
+        self.trace.update(self.player.sprite.rect.x, self.player.sprite.rect.y)
+        self.trace_collision()
+        #---------->
         self.horizontal_movement_collision()
         self.vertical_movement_collision()
         self.coins.draw(self.display_surface)

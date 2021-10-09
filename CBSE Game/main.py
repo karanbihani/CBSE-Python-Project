@@ -1,3 +1,4 @@
+
 import pygame
 import sys
 from random import *
@@ -32,7 +33,7 @@ class Game():
         else:
             game.menue.run()
 
-game = Game(levels, menue_level )
+game = Game(levels, menue_level)
 
 while True:
     
