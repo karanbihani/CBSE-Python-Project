@@ -23,8 +23,7 @@ class Health():
     def life_loss(self):
         self.player_health = PLAYER_HEALTH
         self.lives -= 1
-        print(self.lives)
-    
+        
     def game_state_changer(self):
         if self.lives == 0:
             return False

@@ -25,7 +25,7 @@ class Game():
         self.menue = Menue(self.menue_level,SCREEN,3)
         self.game_active = True
 
-    def run(self,mode = True):#mode is 0 or 1 where 0 is menue and 1 is game
+    def run(self,mode = True):#mode is 0,1 or 2 where 0 is menue and 1 is game
         self.mode = mode
         self.game_active = self.level.game_active
         if self.game_active:

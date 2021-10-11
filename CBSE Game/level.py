@@ -1,6 +1,6 @@
 import os
-
 import pygame
+
 from pygame.sprite import Group
 
 from coins import Coin
@@ -10,9 +10,7 @@ from enemies import Tracer
 from settings import *
 from tiles import Tile
 
-
 pygame.font.init()
-
 
 class Level():
     def __init__(self, level_data, surface):
@@ -22,13 +20,12 @@ class Level():
         self.coins_counter = 0
         self.health = Health()
         self.game_active = True
-        self.trace = pygame.sprite.GroupSingle()
-        self.tracer()
         
     def setup_level(self, layout):
         self.coins = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
         self.tiles = pygame.sprite.Group()
+        self.trace = pygame.sprite.Group()
         for row_index, row in enumerate(layout):
             for col_index, col in enumerate(row):
                 x = col_index * TILE_SIZE
@@ -36,12 +33,15 @@ class Level():
                 if col.lower() == 'x':
                     tile = Tile((x, y), TILE_SIZE)
                     self.tiles.add(tile)
-                if col.lower() == 'p':
+                elif col.lower() == 'p':
                     player_sprite = Player((x, y))
                     self.player.add(player_sprite)
-                if col.lower() == 'c':
+                elif col.lower() == 'c':
                     coin_sprite = Coin((x,y) , COIN_SIZE)
                     self.coins.add(coin_sprite)
+                elif col.lower() == 't':
+                    trace_sprite = Tracer((x,y) , 32)
+                    self.trace.add(trace_sprite)
 
     def scroll_x(self):
         player = self.player.sprite
@@ -89,7 +89,6 @@ class Level():
         player = self.player.sprite
         if pygame.sprite.spritecollide(player, self.coins ,True):
             self.coins_counter += 1
-            self.health.player_health -= 1
     
     def display_coins_collected(self):
         self.font = pygame.font.Font('Assets/font/Pixeltype.ttf',50)
@@ -103,14 +102,18 @@ class Level():
         self.display_surface.blit(self.text,self.text_rect)
         self.display_surface.blit(self.coin_surface , self.coin_rect)
 
-    def tracer(self):
-        trace_sprite = Tracer()
-        self.trace.add(trace_sprite)
-
     def trace_collision(self):
         player = self.player.sprite
         if pygame.sprite.spritecollide(player, self.trace, True):
             self.health.player_health-=6
+
+    def respawn(self):
+        if self.player.sprite.rect.y >750:
+            self.health.lives -= 1
+            self.player.sprite.rect.y = 0
+            pygame.time.delay(500)
+            self.player.sprite.direction.y = -5
+            
 
     def run(self):
         self.game_active = self.health.game_state_changer()
@@ -121,13 +124,12 @@ class Level():
         self.scroll_x()
         self.display_coins_collected()
         self.health.health_run(self.display_surface)
+        self.respawn()
         self.player.update()
         self.player.draw(self.display_surface)
-        #---------->
         self.trace.draw(self.display_surface)
-        self.trace.update(self.player.sprite.rect.x, self.player.sprite.rect.y)
+        self.trace.update(self.player.sprite.rect.x, self.player.sprite.rect.y,self.world_shift)
         self.trace_collision()
-        #---------->
         self.horizontal_movement_collision()
         self.vertical_movement_collision()
         self.coins.draw(self.display_surface)
