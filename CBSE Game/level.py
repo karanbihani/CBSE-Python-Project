@@ -114,6 +114,40 @@ class Level():
             pygame.time.delay(500)
             self.player.sprite.direction.y = -5
             
+    #----------------------------
+    
+    def tracer_movement_x(self):
+        for tracer in self.trace.sprites():
+            for sprite in self.tiles.sprites():
+                if tracer.rect.colliderect(sprite.rect):
+                    if tracer.direction.y < 0:
+                        tracer.direction.x = 5
+                        tracer.direction.y = 0
+                        tracer.rect.top = sprite.rect.bottom
+                    elif tracer.direction.y > 0:
+                        tracer.direction.x = 5
+                        tracer.direction.y = 0
+                        tracer.rect.bottom = sprite.rect.top
+                        tracer.jump_active = JUMP_ACTIVE
+    
+    def tracer_movement_y(self):
+        for tracer in self.trace.sprites():
+            for sprite in self.tiles.sprites():
+                if tracer.rect.colliderect(sprite.rect):
+                    if tracer.direction.x < 0:
+                        tracer.direction.y = 5
+                        tracer.direction.x = 0
+                        tracer.rect.left = sprite.rect.right
+                    elif tracer.direction.x > 0:
+                        tracer.direction.y = 5
+                        tracer.direction.x = 0
+                        tracer.rect.right = sprite.rect.left
+                        tracer.jump_active = JUMP_ACTIVE
+    
+    def tracer_movement(self):
+        self.tracer_movement_x()
+        self.tracer_movement_y()
+    #----------------------------
 
     def run(self):
         self.game_active = self.health.game_state_changer()
@@ -129,6 +163,9 @@ class Level():
         self.player.draw(self.display_surface)
         self.trace.draw(self.display_surface)
         self.trace.update(self.player.sprite.rect.x, self.player.sprite.rect.y,self.world_shift)
+        
+        self.tracer_movement()
+
         self.trace_collision()
         self.horizontal_movement_collision()
         self.vertical_movement_collision()
