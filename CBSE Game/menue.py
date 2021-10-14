@@ -20,5 +20,14 @@ class Menue():
             self.stage_instance = Stage(self.pos,TILE_SIZE,self.tile_active,self.display_surface)
             self.stage.add(self.stage_instance) 
     
+    def game_state_changer(self):
+        mouse_pressed = pygame.mouse.get_pressed()
+        if mouse_pressed[0]:
+            mouse_pos = pygame.mouse.get_pos()
+            for sprite in self.stage.sprites():
+                if sprite.rect.collidepoint(mouse_pos):
+                    self.game_active = True
+    
     def run(self):
         self.stage.draw(self.display_surface)
+        self.game_state_changer()

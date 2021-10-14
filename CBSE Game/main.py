@@ -25,18 +25,21 @@ class Game():
         self.menue = Menue(self.menue_level,SCREEN,3)
         self.game_active = True
 
-    def run(self,mode = True):#mode is 0,1 or 2 where 0 is menue and 1 is game
-        self.mode = mode
-        self.game_active = self.level.game_active
+    def run(self):#mode is 0,1 or 2 where 0 is menue and 1 is game
         if self.game_active:
             game.level.run()
+            self.game_active = self.level.game_active
+            if not self.game_active:
+                self.menue = Menue(self.menue_level,SCREEN,3)
         else:
             game.menue.run()
+            self.game_active = self.menue.game_active
+            if self.game_active:        
+                self.level = Level(self.levels[0], SCREEN)
 
 game = Game(levels, menue_level)
 
 while True:
-    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()   
