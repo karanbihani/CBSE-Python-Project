@@ -9,6 +9,7 @@ from player import Player
 from enemies import Tracer
 from settings import *
 from tiles import Tile
+from bullet import Bullet
 
 pygame.font.init()
 
@@ -20,12 +21,14 @@ class Level():
         self.coins_counter = 0
         self.health = Health()
         self.game_active = True
-        
+        self.shoot_active = True
+
     def setup_level(self, layout):
         self.coins = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
         self.tiles = pygame.sprite.Group()
         self.trace = pygame.sprite.Group()
+        self.bullets = pygame.sprite.Group()
         for row_index, row in enumerate(layout):
             for col_index, col in enumerate(row):
                 x = col_index * TILE_SIZE
@@ -113,9 +116,7 @@ class Level():
             self.player.sprite.rect.y = 0
             pygame.time.delay(500)
             self.player.sprite.direction.y = -5
-            
-    #----------------------------
-    
+      
     def tracer_movement_x(self):
         for tracer in self.trace.sprites():
             for sprite in self.tiles.sprites():
@@ -147,26 +148,73 @@ class Level():
     def tracer_movement(self):
         self.tracer_movement_x()
         self.tracer_movement_y()
+    
     #----------------------------
+    # Shooting
+    # class bullets rect and image, LEVEL- shoot click->add a bukllet to the sprite grp and if sprite collide remove bullet and remove enemy and if it goes beyond bound x removed    
 
+    def bullet_shoot(self):
+        player = self.player.sprite
+        self.player_pos = (player.rect.x , player.rect.y)
+
+        if pygame.mouse.get_pressed()[0] and self.shoot_active ==  True:
+            self.bullet_sprite = Bullet(self.player_pos,BULLET_SIZE,pygame.mouse.get_pos())
+            self.bullets.add(self.bullet_sprite)
+            self.shoot_active = False
+
+        if pygame.mouse.get_pressed()[0] == False:
+            self.shoot_active = True
+
+        for bullet in self.bullets:
+            if bullet.rect.x>(SCREEN_WIDTH + 100) or bullet.rect.x<-100 or bullet.rect.y>(SCREEN_HEIGHT+100) or bullet.rect.y<-100:
+                bullet.kill()
+    
+    def bullet_crash(self):
+        for sprite in self.tiles.sprites():
+            pygame.sprite.spritecollide(sprite, self.bullets ,True)
+
+    def tracer_killer(self):
+        for sprite in self.bullets.sprites():
+            for tracer_sprite in self.trace.sprites():
+                if sprite.rect.colliderect(tracer_sprite.rect):
+                    sprite.kill()
+                    tracer_sprite.kill()
+
+    # WHY?/ What okay anyway back in some
+    # time ? 
+    # bro what the command to delete a sprite from a sprite group
+    #not sure i think sprite.delte or destroy have to check i think destroy
     def run(self):
         self.game_active = self.health.game_state_changer()
         self.tiles.update(self.world_shift)
         self.tiles.draw(self.display_surface)
+
+        self.scroll_x()
+        
         self.coins.update(self.world_shift)
         self.collect_coins()
-        self.scroll_x()
         self.display_coins_collected()
+
         self.health.health_run(self.display_surface)
         self.respawn()
+        
         self.player.update()
         self.player.draw(self.display_surface)
-        self.trace.draw(self.display_surface)
-        self.trace.update(self.player.sprite.rect.x, self.player.sprite.rect.y,self.world_shift)
-        
-        self.tracer_movement()
 
+        #-------------------------
+
+        self.bullet_shoot()
+        self.bullets.update(self.world_shift)
+        self.bullets.draw(self.display_surface)
+        self.tracer_killer()
+        self.bullet_crash()
+        #-------------------------
+       
+        self.tracer_movement()
         self.trace_collision()
+        self.trace.update(self.player.sprite.rect.x, self.player.sprite.rect.y,self.world_shift)
+        self.trace.draw(self.display_surface)
+
         self.horizontal_movement_collision()
         self.vertical_movement_collision()
         self.coins.draw(self.display_surface)

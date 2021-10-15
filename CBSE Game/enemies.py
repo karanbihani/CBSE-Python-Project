@@ -15,7 +15,6 @@ class Tracer(pygame.sprite.Sprite):
         self.rect.x += (self.direction.x)*speed
         self.rect.y += (self.direction.y)*speed
 
-
     def shift(self,x_shift):
         self.rect.x += x_shift
 

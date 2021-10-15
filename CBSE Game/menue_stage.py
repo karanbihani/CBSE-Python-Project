@@ -17,8 +17,6 @@ class Stage(pygame.sprite.Sprite):
             self.image.fill(self.active_color)
         else:
             self.image.fill(self.not_active_color)
-    
-    
-
+            
     def run(self):
         pass
