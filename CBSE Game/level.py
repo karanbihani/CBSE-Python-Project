@@ -10,6 +10,8 @@ from enemies import Tracer
 from settings import *
 from tiles import Tile
 from bullet import Bullet
+from mirror import Mirror
+from bomb import Bomb
 
 pygame.font.init()
 
@@ -29,6 +31,8 @@ class Level():
         self.tiles = pygame.sprite.Group()
         self.trace = pygame.sprite.Group()
         self.bullets = pygame.sprite.Group()
+        self.mirror = pygame.sprite.Group()
+        self.bomb = pygame.sprite.Group()
         for row_index, row in enumerate(layout):
             for col_index, col in enumerate(row):
                 x = col_index * TILE_SIZE
@@ -45,6 +49,12 @@ class Level():
                 elif col.lower() == 't':
                     trace_sprite = Tracer((x,y) , 32)
                     self.trace.add(trace_sprite)
+                elif col.lower() == 'm':
+                    mirror_sprite = Mirror((x,y) , MIRROR_SIZE)
+                    self.mirror.add(mirror_sprite)
+                elif col.lower() == 'b':
+                    bomb_sprite = Bomb((x,y) , BOMB_SIZE)
+                    self.bomb.add(bomb_sprite)
 
     def scroll_x(self):
         player = self.player.sprite
@@ -156,18 +166,20 @@ class Level():
     def bullet_shoot(self):
         player = self.player.sprite
         self.player_pos = (player.rect.x , player.rect.y)
+        self.bullet_counter = 0
 
-        if pygame.mouse.get_pressed()[0] and self.shoot_active ==  True:
+        for bullet in self.bullets.sprites():
+            if bullet.rect.x>(SCREEN_WIDTH + 100) or bullet.rect.x<-100 or bullet.rect.y>(SCREEN_HEIGHT+100) or bullet.rect.y<-100:
+                bullet.kill()
+                self.bullet_counter += 1
+        
+        if pygame.mouse.get_pressed()[0] and self.shoot_active ==  True and self.bullet_counter<=2:
             self.bullet_sprite = Bullet(self.player_pos,BULLET_SIZE,pygame.mouse.get_pos())
             self.bullets.add(self.bullet_sprite)
             self.shoot_active = False
 
         if pygame.mouse.get_pressed()[0] == False:
             self.shoot_active = True
-
-        for bullet in self.bullets:
-            if bullet.rect.x>(SCREEN_WIDTH + 100) or bullet.rect.x<-100 or bullet.rect.y>(SCREEN_HEIGHT+100) or bullet.rect.y<-100:
-                bullet.kill()
     
     def bullet_crash(self):
         for sprite in self.tiles.sprites():
@@ -180,44 +192,77 @@ class Level():
                     sprite.kill()
                     tracer_sprite.kill()
 
-    # WHY?/ What okay anyway back in some
-    # time ? 
-    # bro what the command to delete a sprite from a sprite group
-    #not sure i think sprite.delte or destroy have to check i think destroy
-    def run(self):
-        self.game_active = self.health.game_state_changer()
+    def mirror_collision(self):
+        for sprite in self.mirror.sprites():
+            if pygame.sprite.spritecollide(sprite, self.bullets, True):
+                self.health.player_health -= MIRROR_DAMAGE
+        
+    def bomb_collision(self):
+        player = self.player.sprite
+        if pygame.sprite.spritecollide(player, self.bomb, True):
+            self.health.player_health -= BOMB_DAMAGE
+
+    # Compilation of all run programs to better organise and follow code
+
+    def TILES(self):
         self.tiles.update(self.world_shift)
         self.tiles.draw(self.display_surface)
 
-        self.scroll_x()
-        
+    def COINS(self):
         self.coins.update(self.world_shift)
         self.collect_coins()
         self.display_coins_collected()
+        self.coins.draw(self.display_surface)
 
+    def HEALTHS(self):
         self.health.health_run(self.display_surface)
         self.respawn()
-        
+
+    def PLAYERS(self):
         self.player.update()
         self.player.draw(self.display_surface)
+        self.horizontal_movement_collision()
+        self.vertical_movement_collision()
 
-        #-------------------------
-
+    def BULLETS(self):
         self.bullet_shoot()
         self.bullets.update(self.world_shift)
         self.bullets.draw(self.display_surface)
         self.tracer_killer()
         self.bullet_crash()
-        #-------------------------
-       
+    
+    def TRACERS(self):
         self.tracer_movement()
         self.trace_collision()
         self.trace.update(self.player.sprite.rect.x, self.player.sprite.rect.y,self.world_shift)
         self.trace.draw(self.display_surface)
 
-        self.horizontal_movement_collision()
-        self.vertical_movement_collision()
-        self.coins.draw(self.display_surface)
+    def SETUPER(self):
+        self.game_active = self.health.game_state_changer()
+        self.scroll_x()
+
+    def MIRRORS(self):
+        self.mirror_collision()
+        self.mirror.update(self.world_shift)
+        self.mirror.draw(self.display_surface)
+
+    def BOMBS(self):
+        self.bomb_collision()
+        self.bomb.update(self.world_shift)
+        self.bomb.draw(self.display_surface)
+
+    def run(self):
+        self.SETUPER()
+
+        self.TILES()
+        self.COINS()
+        self.HEALTHS()
+        self.PLAYERS()
+        self.BULLETS()
+        self.TRACERS()
+        self.MIRRORS()
+        self.BOMBS()
+
         #self.health.draw(self.display_surface)
         
 

@@ -14,6 +14,7 @@ class Player(pygame.sprite.Sprite):
         self.speed = PLAYER_SPEED
         self.gravity = GRAVITY
         self.jump_speed = JUMP_SPEED
+        self.space_pressed = False
 
     # Movement
 
@@ -31,6 +32,12 @@ class Player(pygame.sprite.Sprite):
 
         if keys[pygame.K_SPACE] and self.jump_active > 0:
             self.jump()
+            self.jump_active = False
+            self.space_pressed = True
+        
+        if keys[pygame.KEYUP] and self.space_pressed:
+            self.space_pressed = False
+            self.jump_active = True
 
     def apply_gravity(self):
         self.direction.y += self.gravity
