@@ -12,11 +12,13 @@ from tiles import Tile
 from bullet import Bullet
 from mirror import Mirror
 from bomb import Bomb
+from doorway import Door
 
 pygame.font.init()
 
 class Level():
-    def __init__(self, level_data, surface):
+    def __init__(self, level_data, surface,current_level):
+        self.current_level = current_level
         self.display_surface = surface
         self.setup_level(level_data)
         self.world_shift = 0
@@ -33,7 +35,8 @@ class Level():
         self.bullets = pygame.sprite.Group()
         self.mirror = pygame.sprite.Group()
         self.bomb = pygame.sprite.Group()
-        for row_index, row in enumerate(layout):
+        self.door = pygame.sprite.Group()
+        for row_index, row in enumerate(layout[self.current_level]):
             for col_index, col in enumerate(row):
                 x = col_index * TILE_SIZE
                 y = row_index * TILE_SIZE
@@ -55,6 +58,9 @@ class Level():
                 elif col.lower() == 'b':
                     bomb_sprite = Bomb((x,y) , BOMB_SIZE)
                     self.bomb.add(bomb_sprite)
+                elif col.lower() == 'e':
+                    door_sprite = Door((x,y) , DOOR_SIZE)
+                    self.door.add(door_sprite)
 
     def scroll_x(self):
         player = self.player.sprite
@@ -201,12 +207,23 @@ class Level():
         player = self.player.sprite
         if pygame.sprite.spritecollide(player, self.bomb, True):
             self.health.player_health -= BOMB_DAMAGE
+    
+    def next_level(self):
+        player = self.player.sprite
+        if pygame.sprite.spritecollide(player, self.door, False):
+            self.game_active = False
+            self.current_level += 1
 
     # Compilation of all run programs to better organise and follow code
 
     def TILES(self):
         self.tiles.update(self.world_shift)
         self.tiles.draw(self.display_surface)
+    
+    def DOOR(self):
+        self.next_level()
+        self.door.update(self.world_shift)
+        self.door.draw(self.display_surface)
 
     def COINS(self):
         self.coins.update(self.world_shift)
@@ -253,7 +270,6 @@ class Level():
 
     def run(self):
         self.SETUPER()
-
         self.TILES()
         self.COINS()
         self.HEALTHS()
@@ -262,6 +278,7 @@ class Level():
         self.TRACERS()
         self.MIRRORS()
         self.BOMBS()
+        self.DOOR()
 
         #self.health.draw(self.display_surface)
         

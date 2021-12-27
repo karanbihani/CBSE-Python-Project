@@ -11,6 +11,7 @@ class Stage(pygame.sprite.Sprite):
         self.colored()
         self.rect = self.image.get_rect(topleft = pos)
         self.display_surface = display_surface
+        self.tile_active = False
 
     def colored(self):
         if self.active:

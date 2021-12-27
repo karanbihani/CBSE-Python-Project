@@ -18,23 +18,25 @@ clock = pygame.time.Clock()
 
 class Game():
     def __init__(self,levels,menue_level):
+        self.current_level = 0
         self.menue_level = menue_level
         self.levels = levels        
-        self.level = Level(self.levels[0], SCREEN)
+        self.level = Level(self.levels, SCREEN, self.current_level)
         self.menue = Menue(self.menue_level,SCREEN,3)
         self.game_active = True
 
     def run(self):#mode is 0,1 or 2 where 0 is menue and 1 is game
         if self.game_active:
-            game.level.run()
+            game.level.run() 
+            self.current_level = self.level.current_level
             self.game_active = self.level.game_active
             if not self.game_active:
-                self.menue = Menue(self.menue_level,SCREEN,3)
+                self.menue = Menue(self.menue_level, SCREEN, self.current_level+2)
         else:
             game.menue.run()
             self.game_active = self.menue.game_active
             if self.game_active:        
-                self.level = Level(self.levels[0], SCREEN)
+                self.level = Level(self.levels, SCREEN, self.current_level)
 
 game = Game(levels, menue_level)
 
