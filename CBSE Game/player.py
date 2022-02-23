@@ -23,7 +23,7 @@ class Player(pygame.sprite.Sprite):
 
         if keys[pygame.K_d]:
             self.direction.x = 1
-            
+
         elif keys[pygame.K_a]:
             self.direction.x = -1
 
