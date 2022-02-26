@@ -1,5 +1,8 @@
 import os
+from time import time
 import pygame
+import mysql.connector as sql
+import datetime
 
 from pygame.sprite import Group
 
@@ -17,16 +20,41 @@ from doorway import Door
 pygame.font.init()
 
 class Level():
-    def __init__(self, level_data, surface,current_level):
+    def __init__(self, level_data, surface,username, current_level, coins_counter):
         self.current_level = current_level
         self.display_surface = surface
         self.setup_level(level_data)
         self.world_shift = 0
-        self.coins_counter = 0
-        self.health = Health()
+        self.coins_counter = coins_counter
+        self.health = Health(29) #player_health_sql NEEDS WORK F
         self.game_active = True
         self.shoot_active = True
-
+        self.username = username
+    
+    # NEEDS WORK F testing
+    
+    '''
+    def get_record_data(self):
+        con = sql.connect(host = 'localhost', user = 'root', password = 'Bihani123', database = 'quacktable')
+        if con.is_connected():
+            print("Connection Established")
+        cur = con.cursor()  
+        q = (f'select level, coinct from plays where (uname = {self.username}) and (w = 0) order by tolp ascending;') #uname is taken from tkinter NEEDS WORK ok
+        cur.execute(q)
+        x = cur.fetchall()
+        n = x[-1]
+        return(n)
+    '''
+    
+    def insert_record_data(self):
+        con = sql.connect(host = 'localhost', user = 'root', password = 'Bihani123', database = 'quacktable')
+        if con.is_connected():
+            print("Connection Established")
+        cur = con.cursor()
+        q = (f'insert into plays (uname,coinct,level) values("{self.username}", {self.coins_counter},{self.current_level});')
+        cur.execute(q)
+        con.commit()
+    
     def setup_level(self, layout):
         self.coins = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
@@ -215,6 +243,7 @@ class Level():
         if pygame.sprite.spritecollide(player, self.door, False):
             self.game_active = False
             self.current_level += 1
+            self.insert_record_data()
     
     '''
     def pauser(self):
@@ -297,9 +326,8 @@ class Level():
         self.TRACERS()
         self.MIRRORS()
         self.BOMBS()
-        self.DOOR()
-        self.pauser()
-
+        self.DOOR()       
+        #self.pauser()
         #self.health.draw(self.display_surface)
         
 

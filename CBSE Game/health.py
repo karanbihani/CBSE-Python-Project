@@ -4,9 +4,9 @@ from settings import *
 
 class Health():
 
-    def __init__(self):
-        self.lives = LIVES
-        self.player_health = PLAYER_HEALTH
+    def __init__(self,total_health):
+        self.lives = total_health//10
+        self.player_health = total_health % 10
         self.health_icon_image = pygame.image.load(os.path.join('Assets','Images','Health','health_heart.png')).convert_alpha()
         self.health_icon_surface = pygame.transform.scale(self.health_icon_image,(60 , 60))
         self.health_icon_rect = self.health_icon_surface.get_rect(topleft = (900,35))

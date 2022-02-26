@@ -6,7 +6,7 @@ class Menue():
     def __init__(self,menue_data,display_surface,max):
         self.display_surface = display_surface
         self.menue_data = menue_data
-        self.max = max
+        self.max = max + 1
         self.tile_active = True
         self.game_active = False
         self.setup_menue()
@@ -14,8 +14,9 @@ class Menue():
     def setup_menue(self):
         self.stage = pygame.sprite.Group()
         for key in range(5):
-            if self.menue_data[key]['unlocked'] >= self.max:
+            if self.menue_data[key]['unlocked'] > self.max:
                 self.tile_active = False
+                #print(self.max, self.menue_data[key]['unlocked'],self.tile_active)
             self.pos = self.menue_data[key]['pos']
             self.stage_instance = Stage(self.pos,TILE_SIZE,self.tile_active,self.display_surface)
             self.stage.add(self.stage_instance) 
