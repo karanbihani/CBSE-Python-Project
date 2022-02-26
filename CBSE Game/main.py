@@ -39,11 +39,11 @@ def gate():
         print(pry[0][0], PASSWORD, pry[0][1])
         if pry[0][0] == PASSWORD and pry[0][1]>0:
             global STATS
-            q = f"select uname,level,coinct,w from plays group by uname having = '{USERNAME}' and tolp = max(tolp);"
+            q = f"select uname,level,coinct,win from plays where uname = '{USERNAME}' order by tolp;"
             cur.execute(q)
             s = cur.fetchall()
-            if s[3] == 0:
-                STATS = s[0:3]
+            if s[-1][3] == 0:
+                STATS = s[-1][0:3]
             else:
                 STATS = (USERNAME,0,0)
             root.destroy()

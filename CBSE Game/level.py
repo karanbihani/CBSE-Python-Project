@@ -54,6 +54,9 @@ class Level():
         q = (f'insert into plays (uname,coinct,level) values("{self.username}", {self.coins_counter},{self.current_level});')
         cur.execute(q)
         con.commit()
+        q2 = (f'update login set plct = plct + 1')
+        cur.execute(q2)
+        con.commit()
     
     def setup_level(self, layout):
         self.coins = pygame.sprite.Group()
