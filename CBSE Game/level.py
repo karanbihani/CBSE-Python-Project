@@ -246,7 +246,9 @@ class Level():
         if pygame.sprite.spritecollide(player, self.door, False):
             self.game_active = False
             self.current_level += 1
-            self.insert_record_data()
+            if self.current_level != 3:
+                self.insert_record_data()
+            
     
     '''
     def pauser(self):

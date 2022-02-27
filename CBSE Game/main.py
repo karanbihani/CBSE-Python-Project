@@ -20,9 +20,6 @@ pygame.init()
 
 # tkinter login
 
-root = Tk()
-root.title('Student Data')
-
 def gate():
     USERNAME = username.get()
     PASSWORD = password.get()
@@ -30,25 +27,25 @@ def gate():
     con = sql.connect(host = 'localhost', user = 'root', password = 'Bihani123', database = 'quacktable')
     cur = con.cursor()
 
-    pqry = f"select pass,plct from login where uname = '{USERNAME}';"
+    pqry = f"select pass,plct,uname from login where uname = '{USERNAME}';"
     cur.execute(pqry)
     pry = cur.fetchall()
-    print(pry)
 
     if pry:
-        print(pry[0][0], PASSWORD, pry[0][1])
+        #print(pry[0][0], PASSWORD, pry[0][1])
         if pry[0][0] == PASSWORD and pry[0][1]>0:
+            print(True)
             global STATS
             q = f"select uname,level,coinct,win from plays where uname = '{USERNAME}' order by tolp;"
             cur.execute(q)
             s = cur.fetchall()
+            print(s)
             if s[-1][3] == 0:
                 STATS = s[-1][0:3]
             else:
                 STATS = (USERNAME,0,0)
             root.destroy()
 
-        
         elif pry[0][0] == PASSWORD and pry[0][1]==0:
             STATS = (USERNAME,0,0)
             root.destroy()
@@ -60,8 +57,8 @@ def gate():
             message.delete('1.0',END)
             message.insert(END,'Error')
     else:
-        message.delete(0,END)
-        message.insert(0,'Invalid Username. Try again or Register')
+        message.delete('1.0',END)
+        message.insert(END,'Invalid Username. Try again or Register')
 
 def registeration():
     
@@ -91,6 +88,9 @@ def registeration():
 def clearing():
     username.delete(0,END)
     password.delete(0,END)
+
+root = Tk()
+root.title('Student Data')
 
 username = Entry(root,borderwidth=5)
 username.insert(0,'Username')
@@ -138,6 +138,20 @@ class Game():
             self.coin_ct = self.level.coins_counter
             if not self.game_active:
                 self.menue = Menue(self.menue_level, SCREEN, self.current_level)
+            if self.current_level == 3:
+                print('You Won')
+                con = sql.connect(host = 'localhost', user = 'root', password = 'Bihani123', database = 'quacktable')
+                if con.is_connected():
+                    print("Connection Established")
+                cur = con.cursor()
+                q = (f'insert into plays (uname,coinct,level,win) values("{self.username}", {self.coin_ct}, {self.current_level}, 1);')
+                cur.execute(q)
+                con.commit()
+                q2 = (f'update login set plct = plct + 1')
+                cur.execute(q2)
+                con.commit()
+                pygame.quit()
+                sys.exit()    
         else:
             game.menue.run()
             self.game_active = self.menue.game_active
