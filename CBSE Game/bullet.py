@@ -5,9 +5,13 @@ from settings import *
 class Bullet(pygame.sprite.Sprite):
     def __init__(self,pos,size,mpos):
         super().__init__()
+        self.image = pygame.image.load('Assets\Images\Player\eshell.png').convert_alpha()
+        self.rect = self.image.get_rect(topleft = pos)
+        '''
         self.image = pygame.Surface((size,size))
         self.image.fill('blue')
         self.rect =self.image.get_rect(topleft = pos)
+        '''
         self.direction = pygame.math.Vector2(0,0)
         self.player_pos = pos
         self.mpos = mpos

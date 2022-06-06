@@ -4,9 +4,13 @@ import math
 class Tracer(pygame.sprite.Sprite):
     def __init__(self,pos,size):   #px - player's x pos || py - player's y pos
         super().__init__()
+        self.image = pygame.image.load('Assets\Images\Enemies\enemy_2.png').convert_alpha()
+        self.rect = self.image.get_rect(topleft = pos)
+        '''
         self.image = pygame.Surface((size,size))
         self.image.fill('green')
         self.rect = self.image.get_rect(topleft = pos)
+        '''
         self.direction = pygame.math.Vector2(0,0)
 
     def attack(self,speed,normalizer):

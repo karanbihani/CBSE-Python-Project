@@ -1,5 +1,5 @@
 #This contains all variable options/dependencies (Excpet levels)
-
+import pygame
 from mirror import Mirror
 from tiles import Tile
 
@@ -28,3 +28,5 @@ MIRROR_DAMAGE = 1
 BOMB_DAMAGE = 2
 
 JUMP_ACTIVE = 3
+
+

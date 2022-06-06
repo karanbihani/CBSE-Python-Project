@@ -1,4 +1,4 @@
-from ast import Global
+#from ast import Global
 from lib2to3.pgen2.token import NAME
 import pygame
 import sys
@@ -32,14 +32,11 @@ def gate():
     pry = cur.fetchall()
 
     if pry:
-        #print(pry[0][0], PASSWORD, pry[0][1])
         if pry[0][0] == PASSWORD and pry[0][1]>0:
-            print(True)
             global STATS
             q = f"select uname,level,coinct,win from plays where uname = '{USERNAME}' order by tolp;"
             cur.execute(q)
             s = cur.fetchall()
-            print(s)
             if s[-1][3] == 0:
                 STATS = s[-1][0:3]
             else:
@@ -118,47 +115,59 @@ SCREEN = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 pygame.display.set_caption('Agent Quack 007')
 clock = pygame.time.Clock()
 
+game_bg = pygame.image.load('Assets\Images\Background\game_bg.png').convert_alpha()
+game_bg = pygame.transform.scale(game_bg,(1200,700))
+
+menu_bg = pygame.image.load('Assets\Images\Background\menu_bg.png').convert_alpha()
+menu_bg = pygame.transform.scale(game_bg,(1200,700))
+
 class Game():
     #need to add cheker if ther is old data if nto start new with standard data
-    def __init__(self,levels,menue_level,username,current_level,coin_ct): # 26/2 --  need to take coin_ct , username , 
+    def __init__(self,levels,menue_level,username,current_level,coin_ct,game_bg, menu_bg): # 26/2 --  need to take coin_ct , username , 
         self.current_level = current_level 
         self.coin_ct = coin_ct
         self.username = username
+        self.menu_bg = menu_bg
+        self.game_bg = game_bg
         self.menue_level = menue_level
         self.levels = levels
-        self.level = Level(self.levels, SCREEN, self.username, self.current_level ,self.coin_ct) # ok understood
-        self.menue = Menue(self.menue_level,SCREEN,3)
+        self.level = Level(self.levels, SCREEN, self.username, self.current_level ,self.coin_ct,game_bg) # ok understood
+        self.menue = Menue(self.menue_level,SCREEN,3,menu_bg)
         self.game_active = True
         
     def run(self):#mode is 0,1  where 0 is menue and 1 is game
         if self.game_active:
+            SCREEN.blit(self.game_bg, (0,0))
             game.level.run() 
             self.current_level = self.level.current_level
             self.game_active = self.level.game_active
-            self.coin_ct = self.level.coins_counter
             if not self.game_active:
-                self.menue = Menue(self.menue_level, SCREEN, self.current_level)
+                self.menue = Menue(self.menue_level, SCREEN, self.current_level,self.menu_bg)
             if self.current_level == 3:
                 print('You Won')
                 con = sql.connect(host = 'localhost', user = 'root', password = 'Bihani123', database = 'quacktable')
                 if con.is_connected():
-                    print("Connection Established")
-                cur = con.cursor()
-                q = (f'insert into plays (uname,coinct,level,win) values("{self.username}", {self.coin_ct}, {self.current_level}, 1);')
-                cur.execute(q)
-                con.commit()
-                q2 = (f'update login set plct = plct + 1')
-                cur.execute(q2)
-                con.commit()
-                pygame.quit()
-                sys.exit()    
+                    cur = con.cursor()
+                    q = (f'insert into plays (uname,coinct,level,win) values("{self.username}", {self.level.coins_counter_old}, {self.current_level}, 1);')
+                    cur.execute(q)
+                    con.commit()
+                    q2 = (f'update login set plct = plct + 1')
+                    cur.execute(q2)
+                    con.commit()
+                    pygame.quit()
+                    sys.exit()
+                else:
+                    print('Mysql connection not made, please check')  
+        
         else:
+            self.coin_ct = self.level.coins_counter_old
+            SCREEN.blit(self.menu_bg, (0,0))
             game.menue.run()
             self.game_active = self.menue.game_active
             if self.game_active:        
-                self.level = Level(self.levels, SCREEN, self.username, self.current_level, self.coin_ct)
+                self.level = Level(self.levels, SCREEN, self.username, self.current_level, self.coin_ct, self.game_bg)
 
-game = Game(levels, menue_level, STATS[0],STATS[1],STATS[2] )
+game = Game(levels, menue_level, STATS[0],STATS[1],STATS[2] ,game_bg,menu_bg)
 
 while True:
     for event in pygame.event.get():
@@ -169,10 +178,13 @@ while True:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 pass
-            
-    SCREEN.fill('Black')
     
-    game.run()
+    if game.game_active == True:
+        SCREEN.blit(game_bg, (0,0))
+    else:
+        SCREEN.blit(menu_bg, (0,0))
+
+    game.run()    
 
     pygame.display.update()
     clock.tick(FPS)

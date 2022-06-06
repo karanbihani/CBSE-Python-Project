@@ -4,9 +4,8 @@ from settings import *
 class Player(pygame.sprite.Sprite):
     def __init__(self,pos):
         super().__init__()
-        self.image = pygame.Surface((32,64))
-        self.image.fill('red')
-        self.rect = self.image.get_rect(topleft=pos)
+        self.image = pygame.image.load('Assets\Images\Player\player_6.png').convert_alpha()
+        self.rect = self.image.get_rect(topleft = pos)
         
         #movement
         self.direction = pygame.math.Vector2(0,0)
@@ -26,7 +25,7 @@ class Player(pygame.sprite.Sprite):
 
         elif keys[pygame.K_a]:
             self.direction.x = -1
-
+            
         else:
             self.direction.x = 0
 

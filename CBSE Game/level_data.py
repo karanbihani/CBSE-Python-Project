@@ -13,19 +13,6 @@ level_map_0 = [
 ]
 
 level_map_1 = [
-    '                  ',
-    'B      BBBBBB     ',
-    'M   T  TTT    E   ',
-    'XX   XXX      XX  ',
-    'XX         EE  EEE',
-    'XXXX      XX    XX',
-    'XXXX    PXXccc    ',
-    'XX    X XXX   XX  ',
-    '      X XXX   XXX ',
-    '    XXX XXXXX XXXX',
-]
-
-level_map_2 = [
     '     mtc          ',
     '    mtcb          ',
     '   mbctc           ',
@@ -36,6 +23,21 @@ level_map_2 = [
     'XX    X XXX   XX  ',
     '      X XXX   XeX ',
     '    XXX XXXXX X XX',
+    
+]
+
+level_map_2 = [
+
+    '   p            ',
+    '                                            XXXX ',
+    '  b b      m  T     m T              T             XXX',
+    'XXb bXXXmm    XX    m T         XX   T                   XX',
+    'XXb b      m      T m T     T    T     e                     XX ',
+    'XX  X    m       XX m T    XX        XXX                         x' ,
+    '     XX    X  mXTXTX            X                               x',         
+    'XXX    X XX   m TXeX                          cccccccccccccc   x',
+    '      X XX    X X X      XXXX                 cccccccccccccc X',
+    'X                                          XXXXXXXXXXXXXXXX',
 ]
 
 levels = {
