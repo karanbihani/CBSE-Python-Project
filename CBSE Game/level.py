@@ -3,6 +3,7 @@ from time import time
 import pygame
 import mysql.connector as sql
 import datetime
+import time
 
 from pygame.sprite import Group
 
@@ -27,25 +28,39 @@ class Level():
         self.world_shift = 0
         self.coins_counter = 0
         self.coins_counter_old = coins_counter
-        self.health = Health(39) 
+        self.health = Health(39) #player_health_sql NEEDS WORK F
         self.game_active = True
         self.shoot_active = True
         self.username = username
         self.game_bg = game_bg
     
-    def insert_record_data(self):
+    # NEEDS WORK F testing
+    
+    '''
+    def get_record_data(self):
         con = sql.connect(host = 'localhost', user = 'root', password = 'Bihani123', database = 'quacktable')
-        if con.is_connected():        
-            cur = con.cursor()
-            q = (f'insert into plays (uname,coinct,level) values("{self.username}", {self.coins_counter_old },{self.current_level});')
-            cur.execute(q)
-            con.commit()
-            q2 = (f'update login set plct = plct + 1')
-            cur.execute(q2)
-            con.commit()
-        else:
-            print('Mysql connection not made, please check')
-        
+        if con.is_connected():
+            print("Connection Established")
+        cur = con.cursor()  
+        q = (f'select level, coinct from plays where (uname = {self.username}) and (w = 0) order by tolp ascending;') #uname is taken from tkinter NEEDS WORK ok
+        cur.execute(q)
+        x = cur.fetchall()
+        n = x[-1]
+        return(n)
+    '''
+    
+    def insert_record_data(self):
+        con = sql.connect(host = 'localhost', user = 'root', password = 'bihani123', database = DATABASES)
+        if con.is_connected():
+            print("Connection Established")
+        cur = con.cursor()
+        q = (f'insert into plays (uname,coinct,level) values("{self.username}", {self.coins_counter},{self.current_level});')
+        cur.execute(q)
+        con.commit()
+        q2 = (f'update login set plct = plct + 1')
+        cur.execute(q2)
+        con.commit()
+    
     def setup_level(self, layout):
         self.coins = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
@@ -184,21 +199,24 @@ class Level():
         self.tracer_movement_x()
         self.tracer_movement_y()
     
+    #----------------------------
+    # Shooting
+    # class bullets rect and image, LEVEL- shoot click->add a bukllet to the sprite grp and if sprite collide remove bullet and remove enemy and if it goes beyond bound x removed    
+
     def bullet_shoot(self):
         player = self.player.sprite
         self.player_pos = (player.rect.x , player.rect.y)
         self.bullet_counter = 0
 
         for bullet in self.bullets.sprites():
-            self.bullet_counter += 1
             if bullet.rect.x>(SCREEN_WIDTH + 100) or bullet.rect.x<-100 or bullet.rect.y>(SCREEN_HEIGHT+100) or bullet.rect.y<-100:
                 bullet.kill()
-                self.bullet_counter -= 1
-            print(self.bullet_counter)
-                
-        if pygame.mouse.get_pressed()[0] and self.shoot_active ==  True and self.bullet_counter<1:
+                self.bullet_counter += 1
+        
+        if pygame.mouse.get_pressed()[0] and self.shoot_active ==  True and self.bullet_counter<=2:
             self.bullet_sprite = Bullet(self.player_pos,BULLET_SIZE,pygame.mouse.get_pos())
             self.bullets.add(self.bullet_sprite)
+            self.shoot_active = False
 
         if pygame.mouse.get_pressed()[0] == False:
             self.shoot_active = True
@@ -231,10 +249,27 @@ class Level():
         if pygame.sprite.spritecollide(player, self.door, False):
             self.game_active = False
             self.current_level += 1
-            self.coins_counter_old += self.coins_counter
+            self.coins_counter_old += self.coins_counter_old
             if self.current_level != 3:
                 self.insert_record_data()
     
+    '''
+    def pauser(self):
+        self.pause = False
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_p]:
+            print(True)
+            self.pause = True
+            while self.pause:
+                pygame.time.Clock().tick(1)
+                print(True)
+                self.display_surface.fill('white')
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_c]:
+                    self.pause = False
+                    pygame.time.Clock().tick(FPS)
+    '''
+
     # Compilation of all run programs to better organise and follow code
 
     def TILES(self):
@@ -292,6 +327,7 @@ class Level():
         self.bomb.draw(self.display_surface)
 
     def run(self):
+        #self.display_surface.blit(self.game_bg, (0,0))
         self.SETUPER()
         self.TILES()
         self.COINS()
@@ -301,4 +337,6 @@ class Level():
         self.TRACERS()
         self.MIRRORS()
         self.BOMBS()
-        self.DOOR()       
+        self.DOOR()      
+        #self.pauser()
+        #self.health.draw(self.display_surface)

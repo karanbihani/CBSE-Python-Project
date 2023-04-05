@@ -29,4 +29,4 @@ BOMB_DAMAGE = 2
 
 JUMP_ACTIVE = 3
 
-
+DATABASES = "game"

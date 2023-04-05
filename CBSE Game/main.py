@@ -6,6 +6,7 @@ from random import *
 from pygame.constants import QUIT
 import mysql.connector as sql
 from tkinter import *
+import time
 
 STATS = ()
 
@@ -18,13 +19,31 @@ from menue import Menue
 
 pygame.init()
 
+"""
+try:
+    connection =sql.connect(host='localhost',database='Electronics',user='pynative',password='pynative@#29')
+
+    mySql_Create_Table_Query = "create "
+
+    cursor = connection.cursor()
+    result = cursor.execute(mySql_Create_Table_Query)
+    print("Laptop Table created successfully ")
+
+except mysql.connector.Error as error:
+    print("Failed to create table in MySQL: {}".format(error))
+finally:
+    if connection.is_connected():
+        cursor.close()
+        connection.close()
+        print("MySQL connection is closed")
+"""
 # tkinter login
 
 def gate():
     USERNAME = username.get()
     PASSWORD = password.get()
 
-    con = sql.connect(host = 'localhost', user = 'root', password = 'Bihani123', database = 'quacktable')
+    con = sql.connect(host = 'localhost', user = 'root', password = 'bihani123', database = DATABASES)
     cur = con.cursor()
 
     pqry = f"select pass,plct,uname from login where uname = '{USERNAME}';"
@@ -32,11 +51,15 @@ def gate():
     pry = cur.fetchall()
 
     if pry:
+        #print(pry[0][0], PASSWORD, pry[0][1])
+        print(pry)
         if pry[0][0] == PASSWORD and pry[0][1]>0:
+            print(True)
             global STATS
             q = f"select uname,level,coinct,win from plays where uname = '{USERNAME}' order by tolp;"
             cur.execute(q)
             s = cur.fetchall()
+            print(s)
             if s[-1][3] == 0:
                 STATS = s[-1][0:3]
             else:
@@ -62,7 +85,7 @@ def registeration():
     USERNAME = username.get()
     PASSWORD = password.get()
 
-    con = sql.connect(host = 'localhost', user = 'root', password = 'Bihani123', database = 'quacktable')
+    con = sql.connect(host = 'localhost', user = 'root', password = 'bihani123', database = DATABASES)
     cur = con.cursor()
 
     pqry = f"select pass from login where uname = '{USERNAME}';"
@@ -145,22 +168,20 @@ class Game():
                 self.menue = Menue(self.menue_level, SCREEN, self.current_level,self.menu_bg)
             if self.current_level == 3:
                 print('You Won')
-                con = sql.connect(host = 'localhost', user = 'root', password = 'Bihani123', database = 'quacktable')
+                con = sql.connect(host = 'localhost', user = 'root', password = 'bihani123', database = DATABASES)
                 if con.is_connected():
-                    cur = con.cursor()
-                    q = (f'insert into plays (uname,coinct,level,win) values("{self.username}", {self.level.coins_counter_old}, {self.current_level}, 1);')
-                    cur.execute(q)
-                    con.commit()
-                    q2 = (f'update login set plct = plct + 1')
-                    cur.execute(q2)
-                    con.commit()
-                    pygame.quit()
-                    sys.exit()
-                else:
-                    print('Mysql connection not made, please check')  
-        
+                    print("Connection Established")
+                cur = con.cursor()
+                q = (f'insert into plays (uname,coinct,level,win) values("{self.username}", {self.coin_ct}, {self.current_level}, 1);')
+                cur.execute(q)
+                con.commit()
+                q2 = (f'update login set plct = plct + 1')
+                cur.execute(q2)
+                con.commit()
+                pygame.quit()
+                sys.exit()    
         else:
-            self.coin_ct = self.level.coins_counter_old
+            self.coin_ct = self.level.coins_counter + self.level.coins_counter_old
             SCREEN.blit(self.menu_bg, (0,0))
             game.menue.run()
             self.game_active = self.menue.game_active
